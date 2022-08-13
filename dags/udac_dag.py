@@ -101,22 +101,15 @@ run_quality_checks = DataQualityOperator(
         "songs": SqlQueries.check_songs,
         "artists": SqlQueries.check_artists,
         "time": SqlQueries.check_time,
-        "paid users": SqlQueries.check_paid_users,
     },
 )
 
 end_operator = EmptyOperator(task_id="Stop_execution", dag=dag)
 
-start_operator >> stage_events_to_redshift
-start_operator >> stage_songs_to_redshift
-stage_events_to_redshift >> load_songplays_table
-stage_songs_to_redshift >> load_songplays_table
-load_songplays_table >> load_song_dimension_table
-load_songplays_table >> load_artist_dimension_table
-load_songplays_table >> load_user_dimension_table
-load_songplays_table >> load_time_dimension_table
-load_song_dimension_table >> run_quality_checks
-load_artist_dimension_table >> run_quality_checks
-load_user_dimension_table >> run_quality_checks
-load_time_dimension_table >> run_quality_checks
+start_operator >> [stage_events_to_redshift, stage_songs_to_redshift]
+[stage_events_to_redshift, stage_songs_to_redshift] >> load_songplays_table
+load_songplays_table >> [load_song_dimension_table, load_artist_dimension_table,
+                         load_user_dimension_table, load_time_dimension_table]
+[load_song_dimension_table, load_artist_dimension_table,
+ load_user_dimension_table, load_time_dimension_table] >> run_quality_checks
 run_quality_checks >> end_operator

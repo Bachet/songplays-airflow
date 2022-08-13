@@ -42,15 +42,10 @@ class SqlQueries:
         FROM songplays
     """
 
-    check_songplays = "SELECT COUNT(*) FROM songplays"
-    check_users = "SELECT COUNT(*) FROM users"
-    check_time = "SELECT COUNT(*) FROM time"
-    check_artists = "SELECT COUNT(*) FROM artists"
-    check_songs = "SELECT COUNT(*) FROM songs"
-
-    check_paid_users = """
-        SELECT COUNT(distinct users.userid) 
-        FROM songplays 
-        JOIN users ON songplays.userid = users.userid
-        WHERE users.level = 'paid'
-    """
+    check_songplays = {
+        "stmt": "SELECT COUNT(*) FROM songplays WHERE userid IS NULL OR start_time IS NULL", "expected": 0
+    }
+    check_users = {"stmt": "SELECT COUNT(*) FROM users WHERE userid IS NULL", "expected": 0}
+    check_time = {"stmt": "SELECT COUNT(*) FROM time WHERE start_time IS NULL", "expected": 0}
+    check_artists = {"stmt": "SELECT COUNT(*) FROM artists WHERE artistid IS NULL", "expected": 0}
+    check_songs = {"stmt": "SELECT COUNT(*) FROM songs WHERE songid IS NULL", "expected": 0}
